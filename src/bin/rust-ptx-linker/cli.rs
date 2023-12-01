@@ -64,9 +64,14 @@ fn get_app() -> App<'static, 'static> {
             {
                 Arg::with_name("fallback_arch")
                     .long("fallback-arch")
-                    .help("Rust own target architecture")
+                    .help("Rust own target architecture (alternative to `target-cpu`)")
                     .takes_value(true)
-                    .default_value("sm_30")
+            },
+            {
+                Arg::with_name("target-cpu")
+                    .long("target-cpu")
+                    .help("Rust own target architecture (alternative to `fallback_arch`)")
+                    .takes_value(true)
             },
             {
                 Arg::with_name("arch")
@@ -90,11 +95,24 @@ fn get_app() -> App<'static, 'static> {
                     .number_of_values(1)
                     .use_delimiter(true)
             },
+            {
+                Arg::with_name("target")
+                    .long("target")
+                    .help("Compilation target")
+                    .takes_value(true)
+                    .default_value("nvptx64-nvidia-cuda")
+            },
         ])
 }
 
 fn parse_session(matches: ArgMatches<'static>) -> Session {
     let mut session = Session::default();
+
+    assert_eq!(
+        matches.value_of("target"),
+        Some("nvptx64-nvidia-cuda"),
+        "Only the `nvptx64-nvidia-cuda` target is supported",
+    );
 
     if let Some(inputs) = matches.values_of("bitcode") {
         for input in inputs {
@@ -143,9 +161,20 @@ fn parse_session(matches: ArgMatches<'static>) -> Session {
         }
     }
 
-    if let Some(arch) = matches.value_of("fallback_arch") {
-        session.set_fallback_arch(arch);
-    }
+    let fallback_arch = match (
+        matches.value_of("fallback_arch"),
+        matches.value_of("target_cpu"),
+    ) {
+        (Some(arch), None) => arch,
+        (None, Some(arch)) => arch,
+        (None, None) => "sm_30",
+        (Some(arch1), Some(arch2)) if arch1 == arch2 => arch1,
+        (Some(_), Some(_)) => {
+            panic!("Using both `fallback_arch` and `target_cpu` is not supported")
+        }
+    };
+
+    session.set_fallback_arch(fallback_arch);
 
     session
 }
