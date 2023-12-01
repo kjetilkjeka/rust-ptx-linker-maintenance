@@ -13,7 +13,7 @@ use llvm_sys::linker::*;
 use llvm_sys::prelude::*;
 use llvm_sys::target::*;
 use llvm_sys::target_machine::*;
-use llvm_sys::transforms::{ipo::*, pass_manager_builder::*};
+use llvm_sys::transforms::pass_manager_builder::*;
 
 use ar::Archive;
 use failure::{bail, Error, ResultExt};
@@ -156,7 +156,8 @@ impl Linker {
             }
 
             // The pass is needed to perform cleanup after our internaliser.
-            LLVMAddGlobalDCEPass(pass_manager);
+            // FIXME: This way of handling passes is deprecated in LLVM used in new versions of rust.
+            //LLVMAddGlobalDCEPass(pass_manager);
 
             // TODO(denzp): check the result
             LLVMRunPassManager(pass_manager, self.module);
