@@ -5,7 +5,7 @@ At the time of writing (2023-12-01) the original ptx-linker project is abandoned
 With the recent development, you should pass `-C linker=rust-ptx-linker` (use the path to `rust-ptx-linker` if it is not contained in the `PATH` envvar) to rustc to use this linker.
 
 ## Installation
-The [`ptx-linker`](https://crates.io/crates/ptx-linker) crate on crates.io is abandoned and this fork will not be published under a new name. Install by pulling this git repository and run `cargo install --path <PATH TO REPO>`
+The [`ptx-linker`](https://crates.io/crates/ptx-linker) crate on crates.io is abandoned and this fork will not be published under a new name. Install by pulling this git repository and run `cargo install --git https://github.com/kjetilkjeka/rust-ptx-linker-maintenance`
 
 ## Maintenance Status
 This project is not being actively maintained. PRs will not be accepted other than fixing breakage to basic usage.
